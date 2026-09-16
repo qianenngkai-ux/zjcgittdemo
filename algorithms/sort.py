@@ -89,12 +89,12 @@ def quick_sort(items):
     """快速排序（分治，原地分区）。
 
     选一个基准值，把列表分成「不大于基准」和「大于基准」两部分，
-    再对两部分递归。这里用 Lomuto 分区，取末位元素作基准。
+    再对两部分递归。这里用 Lomuto 分区 + 三数取中选基准。
 
     非稳定：分区时的远距离交换会打乱相等元素的相对顺序。
 
-    注意最坏情况：当输入已经有序或逆序时，每次分区都极度不平衡，
-    退化为 O(n²) 且递归深度为 n。改进办法是随机选基准或三数取中。
+    最坏情况仍是 O(n²)（例如大量重复元素），但**不会**因递归过深而崩溃：
+    递归只在较小的一侧进行，较大的一侧改用循环，栈深度恒为 O(log n)。
 
     >>> quick_sort([3, 1, 2])
     [1, 2, 3]
@@ -105,17 +105,46 @@ def quick_sort(items):
 
 
 def _quick_sort_in_place(arr, low, high):
-    """对 arr[low..high] 区间原地排序。"""
-    if low >= high:
-        return
+    """对 arr[low..high] 区间原地排序。
 
-    pivot_index = _partition(arr, low, high)
-    _quick_sort_in_place(arr, low, pivot_index - 1)
-    _quick_sort_in_place(arr, pivot_index + 1, high)
+    用循环而非双递归：每次只对较小的一侧递归，较大的一侧留在循环里继续处理。
+    这样无论划分多么不平衡，栈深度都不超过 O(log n)。
+    若两侧都递归，遇到有序输入或大量重复元素时会退化到 O(n) 深度，
+    进而触发 Python 的 RecursionError。
+    """
+    while low < high:
+        pivot_index = _partition(arr, low, high)
+
+        left_size = pivot_index - low
+        right_size = high - pivot_index
+
+        if left_size < right_size:
+            _quick_sort_in_place(arr, low, pivot_index - 1)
+            low = pivot_index + 1
+        else:
+            _quick_sort_in_place(arr, pivot_index + 1, high)
+            high = pivot_index - 1
 
 
 def _partition(arr, low, high):
-    """Lomuto 分区：以 arr[high] 为基准，返回基准最终所在下标。"""
+    """Lomuto 分区：以 arr[high] 为基准，返回基准最终所在下标。
+
+    基准由「三数取中」选出：取首、中、尾三个元素的中位数并换到末位。
+    固定取末位的话，已排序或逆序的输入会让每次划分都极度不平衡。
+    """
+    mid = (low + high) // 2
+
+    # 三步比较后，三者有序：arr[low] <= arr[mid] <= arr[high]
+    if arr[mid] < arr[low]:
+        arr[low], arr[mid] = arr[mid], arr[low]
+    if arr[high] < arr[low]:
+        arr[low], arr[high] = arr[high], arr[low]
+    if arr[high] < arr[mid]:
+        arr[mid], arr[high] = arr[high], arr[mid]
+
+    # 中位数现在位于 arr[mid]，换到末位作为基准
+    arr[mid], arr[high] = arr[high], arr[mid]
+
     pivot = arr[high]
     i = low - 1
 

@@ -9,7 +9,14 @@
 import random
 import unittest
 
-from sort import bubble_sort, merge_sort, quick_sort
+# 兼容两种运行方式：
+#   1. 当作包导入（-m unittest algorithms.test_sort、根目录 discover）
+#   2. 直接运行本文件（python3 algorithms/test_sort.py）—— 此时
+#      sys.path 里是 algorithms/ 而非仓库根目录，包名导入会失败。
+try:
+    from algorithms.sort import bubble_sort, merge_sort, quick_sort
+except ModuleNotFoundError:
+    from sort import bubble_sort, merge_sort, quick_sort
 
 
 class SortContractMixin:
@@ -97,6 +104,27 @@ class SortContractMixin:
         rng = random.Random(7)
         data = [rng.choice([0, 1, 2]) for _ in range(200)]
         self.assertEqual(self.sort(data), sorted(data))
+
+    # ---- 最坏情况回归测试 ----
+    #
+    # 固定取末位作基准的分区，在有序输入下每次划分都极不平衡，递归深度
+    # 退化为 O(n)，会撞上 Python 默认的递归上限（1000）直接崩溃。
+    # 下面三条用例专门盯住这个最坏情况，规模取 2000 以留出安全余量。
+
+    def test_large_already_sorted(self):
+        """已排序的大输入 —— 快排的经典最坏情况。"""
+        data = list(range(2000))
+        self.assertEqual(self.sort(data), data)
+
+    def test_large_reverse_sorted(self):
+        """逆序的大输入 —— 另一个最坏情况。"""
+        data = list(range(2000, 0, -1))
+        self.assertEqual(self.sort(data), list(range(1, 2001)))
+
+    def test_large_all_identical(self):
+        """元素全部相同 —— 分区会把它们全划到同一侧。"""
+        data = [5] * 2000
+        self.assertEqual(self.sort(data), data)
 
 
 class TestBubbleSort(SortContractMixin, unittest.TestCase):
