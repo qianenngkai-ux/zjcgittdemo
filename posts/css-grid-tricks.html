@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grid 布局的五个实用技巧 — 我的技术博客</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/post.css">
+  <script src="../assets/js/blog-core.js"></script>
+  <script src="../assets/js/posts.js"></script>
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-title" href="../index.html">我的技术博客</a>
+      <nav class="site-nav">
+        <a class="site-nav__link" href="../about.html">关于</a>
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换主题"></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <article>
+      <a class="back-link" href="../index.html">← 返回首页</a>
+
+      <header class="post-header">
+        <h1 class="post-header__title">Grid 布局的五个实用技巧</h1>
+        <div class="post-meta">
+          <time datetime="2026-09-10">2026-09-10</time>
+          <span class="post-meta__sep">·</span>
+          <span class="post-tag">CSS</span>
+          <span class="post-meta__sep">·</span>
+          <span>8 分钟</span>
+        </div>
+      </header>
+
+      <div class="post-body">
+        <p>Flexbox 解决一维排布，Grid 解决二维。但多数人对 Grid 的用法停留在 <code>grid-template-columns: repeat(3, 1fr)</code>，没用上它真正省事的那几个特性。</p>
+
+        <h2>1. auto-fit 代替媒体查询</h2>
+        <p>不需要为「平板上两列、手机上单列」写断点，交给浏览器算：</p>
+
+        <pre><code>.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}</code></pre>
+
+        <p>容器放得下几个 240px 的列，就排几列。窗口一缩，列数自动减少。</p>
+
+        <h2>2. 负网格线</h2>
+        <p><code>-1</code> 永远代表最后一条网格线，不管实际有多少列。这让「撑满整行」不依赖具体的列数：</p>
+
+        <pre><code>.full-bleed {
+  grid-column: 1 / -1;
+}</code></pre>
+
+        <h2>3. 用 gap 代替 margin</h2>
+        <p><code>gap</code> 只作用于项目之间，不会在最外侧产生多余间距。以前用 <code>margin-right</code> 再给最后一个子元素写 <code>:last-child { margin-right: 0 }</code> 的做法可以彻底删掉。</p>
+
+        <h2>4. 网格区域命名</h2>
+        <p>用 <code>grid-template-areas</code> 画 ASCII 图，比记行列号可读得多，改版式时也只需要挪动那几个单词：</p>
+
+        <pre><code>.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 200px 1fr;
+}
+
+.layout &gt; header { grid-area: header; }
+.layout &gt; aside  { grid-area: sidebar; }
+.layout &gt; main   { grid-area: main; }</code></pre>
+
+        <h2>5. minmax 与 auto 配合</h2>
+        <p>侧边栏固定宽度在窄屏会挤扁主内容。<code>minmax(200px, auto)</code> 让它有下限也能撑开：</p>
+
+        <pre><code>grid-template-columns: minmax(200px, auto) 1fr;</code></pre>
+
+        <h2>小结</h2>
+        <p>这几个特性都不需要 JavaScript，也不需要预处理器。Grid 的能力比大多数人日常用到的多得多。</p>
+      </div>
+    </article>
+
+    <nav class="post-nav">
+      <a href="understanding-closures.html">
+        <span class="post-nav__label">← 上一篇</span>
+        <span>理解闭包到底在讲什么</span>
+      </a>
+      <a class="post-nav__next" href="array-generics-pitfall.html">
+        <span class="post-nav__label">下一篇 →</span>
+        <span>Array&lt;T&gt; 与 Array&lt;U&gt; 的类型陷阱</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© 2026 我的技术博客</p></div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>理解闭包到底在讲什么 — 我的技术博客</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/post.css">
+  <script src="../assets/js/blog-core.js"></script>
+  <script src="../assets/js/posts.js"></script>
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-title" href="../index.html">我的技术博客</a>
+      <nav class="site-nav">
+        <a class="site-nav__link" href="../about.html">关于</a>
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换主题"></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <article>
+      <a class="back-link" href="../index.html">← 返回首页</a>
+
+      <header class="post-header">
+        <h1 class="post-header__title">理解闭包到底在讲什么</h1>
+        <div class="post-meta">
+          <time datetime="2026-09-16">2026-09-16</time>
+          <span class="post-meta__sep">·</span>
+          <span class="post-tag">JavaScript</span>
+          <span class="post-meta__sep">·</span>
+          <span>5 分钟</span>
+        </div>
+      </header>
+
+      <div class="post-body">
+        <p>提到闭包，最常见的解释是「函数里套函数，内层函数能访问外层函数的变量」。这句话没错，但它只描述了现象，没解释为什么这件事值得单独有个名字。</p>
+
+        <h2>从作用域链说起</h2>
+        <p>JavaScript 的函数在<strong>定义时</strong>就确定了自己的作用域链，而不是调用时。这意味着内层函数无论被带到哪里执行，它记住的始终是定义位置的外层变量。</p>
+
+        <pre><code>function makeCounter() {
+  let count = 0;
+  return function () {
+    count += 1;
+    return count;
+  };
+}
+
+const next = makeCounter();
+next(); // 1
+next(); // 2</code></pre>
+
+        <p>函数返回之后，<code>makeCounter</code> 的局部变量 <code>count</code> 本该被回收，但它没有。因为返回的那个函数仍然引用着它——这就是闭包。</p>
+
+        <h2>它到底解决了什么</h2>
+        <p>在模块和 <code>let</code> 出现之前，闭包是 JavaScript 里唯一的「私有变量」方案。它让数据可以被一组函数共享，又不暴露到全局。</p>
+        <p>另一个常见用途是固定循环变量的值：</p>
+
+        <pre><code>// 全部输出 3（var 是函数作用域，共享同一个变量）
+for (var i = 0; i &lt; 3; i++) {
+  setTimeout(() => console.log(i));
+}
+
+// 输出 0 1 2（每次迭代都有新的绑定）
+for (let i = 0; i &lt; 3; i++) {
+  setTimeout(() => console.log(i));
+}</code></pre>
+
+        <h2>代价</h2>
+        <p>闭包会让被引用的变量无法被垃圾回收。绝大多数情况下这不是问题，但如果你在一个长生命周期的事件回调里闭包了一个大对象，那块内存就一直不会释放。</p>
+        <p>诊断方法很直接：在 DevTools 的 Memory 面板里拍两次快照，对比找那些「本该消失却没消失」的对象。</p>
+      </div>
+    </article>
+
+    <nav class="post-nav">
+      <a href="array-generics-pitfall.html">
+        <span class="post-nav__label">← 上一篇</span>
+        <span>Array&lt;T&gt; 与 Array&lt;U&gt; 的类型陷阱</span>
+      </a>
+      <a class="post-nav__next" href="css-grid-tricks.html">
+        <span class="post-nav__label">下一篇 →</span>
+        <span>Grid 布局的五个实用技巧</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© 2026 我的技术博客</p></div>
+  </footer>
+</body>
+</html>
