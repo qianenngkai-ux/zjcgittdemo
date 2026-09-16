@@ -42,6 +42,9 @@ cp template.html posts/my-new-post.html
 ├── about.html            关于
 ├── template.html         新文章模板
 ├── posts/                文章页，一篇一个 HTML 文件
+├── algorithms/           排序算法（Python）
+│   ├── sort.py           冒泡 / 归并 / 快速排序
+│   └── test_sort.py      标准库 unittest 测试
 ├── assets/
 │   ├── css/
 │   │   ├── main.css      设计令牌、布局、导航、列表
@@ -71,6 +74,22 @@ bash tests/render-check.sh
 ```
 
 这个脚本用无头 Chrome 加载真实页面，断言 JS 执行之后的 DOM，覆盖单元测试测不到的部分：脚本加载顺序、`home.js` 的 DOM 接线、文章页的相对路径。需要本机装有 Chrome。
+
+### 排序算法的测试（Python）
+
+`algorithms/` 下是三种排序算法，用 Python 标准库 `unittest` 测试，同样无需安装任何依赖：
+
+```bash
+python3 -m unittest discover -s algorithms -p 'test_*.py' -v
+```
+
+48 个用例覆盖空列表、单元素、已排序、逆序、重复值、负数、浮点数，以及「不修改原列表」「返回值不是入参别名」等约定。三个算法共用同一套契约测试（`SortContractMixin`），任何实现有缺口都会立刻暴露。
+
+docstring 里的示例可直接验证：
+
+```bash
+python3 -m doctest algorithms/sort.py -v
+```
 
 ## 标签筛选
 
