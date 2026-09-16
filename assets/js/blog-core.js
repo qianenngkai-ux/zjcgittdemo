@@ -47,7 +47,38 @@ function filterByTag(posts, tag) {
   return posts.filter(post => (post.tags || []).includes(tag));
 }
 
+/**
+ * 从 URL hash 中解析标签，形如 #tag=JavaScript。
+ * 无标签或格式不符时返回 null。
+ */
+function parseTagFromHash(hash) {
+  if (!hash || typeof hash !== 'string') return null;
+  const match = hash.match(/^#tag=(.+)$/);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch (err) {
+    return null; // hash 中含非法百分号编码
+  }
+}
+
+/**
+ * 决定当前应使用的主题。
+ * 用户的显式选择优先于系统偏好。
+ */
+function resolveTheme(storedTheme, prefersDark) {
+  if (storedTheme === 'dark' || storedTheme === 'light') return storedTheme;
+  return prefersDark ? 'dark' : 'light';
+}
+
 // Node 测试用；浏览器中 module 未定义，此行跳过。
 if (typeof module !== 'undefined') {
-  module.exports = { escapeHTML, sortByDateDesc, extractTags, filterByTag };
+  module.exports = {
+    escapeHTML,
+    sortByDateDesc,
+    extractTags,
+    filterByTag,
+    parseTagFromHash,
+    resolveTheme
+  };
 }

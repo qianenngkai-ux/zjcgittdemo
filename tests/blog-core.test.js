@@ -4,7 +4,9 @@ const {
   escapeHTML,
   sortByDateDesc,
   extractTags,
-  filterByTag
+  filterByTag,
+  parseTagFromHash,
+  resolveTheme
 } = require('../assets/js/blog-core.js');
 
 // ---- escapeHTML ----
@@ -89,4 +91,42 @@ test('filterByTag 传入 null 或空串时返回全部', () => {
 test('filterByTag 无匹配时返回空数组', () => {
   const posts = [{ title: 'a', tags: ['JavaScript'] }];
   assert.deepStrictEqual(filterByTag(posts, 'Rust'), []);
+});
+
+// ---- parseTagFromHash ----
+
+test('parseTagFromHash 解析出标签', () => {
+  assert.strictEqual(parseTagFromHash('#tag=JavaScript'), 'JavaScript');
+});
+
+test('parseTagFromHash 解码 URL 编码的标签', () => {
+  assert.strictEqual(parseTagFromHash('#tag=C%2B%2B'), 'C++');
+  assert.strictEqual(parseTagFromHash('#tag=%E5%B7%A5%E5%85%B7'), '工具');
+});
+
+test('parseTagFromHash 对空 hash 或无关 hash 返回 null', () => {
+  assert.strictEqual(parseTagFromHash(''), null);
+  assert.strictEqual(parseTagFromHash('#'), null);
+  assert.strictEqual(parseTagFromHash('#other=1'), null);
+});
+
+test('parseTagFromHash 对 null 返回 null', () => {
+  assert.strictEqual(parseTagFromHash(null), null);
+});
+
+// ---- resolveTheme ----
+
+test('resolveTheme 优先采用已保存的主题', () => {
+  assert.strictEqual(resolveTheme('dark', false), 'dark');
+  assert.strictEqual(resolveTheme('light', true), 'light');
+});
+
+test('resolveTheme 无保存值时跟随系统偏好', () => {
+  assert.strictEqual(resolveTheme(null, true), 'dark');
+  assert.strictEqual(resolveTheme(null, false), 'light');
+});
+
+test('resolveTheme 忽略非法的保存值', () => {
+  assert.strictEqual(resolveTheme('purple', true), 'dark');
+  assert.strictEqual(resolveTheme('', false), 'light');
 });
