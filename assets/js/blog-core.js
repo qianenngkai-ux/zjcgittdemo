@@ -71,6 +71,51 @@ function resolveTheme(storedTheme, prefersDark) {
   return prefersDark ? 'dark' : 'light';
 }
 
+/**
+ * 生成标签栏的 HTML 字符串。
+ * activeTag 对应的按钮 aria-pressed="true"，其余为 "false"。
+ */
+function renderTagBarHTML(tags, activeTag) {
+  return tags
+    .map(tag => {
+      const pressed = tag === activeTag ? 'true' : 'false';
+      return (
+        `<button class="tag" type="button" data-tag="${escapeHTML(tag)}" aria-pressed="${pressed}">` +
+        `${escapeHTML(tag)}</button>`
+      );
+    })
+    .join('');
+}
+
+/**
+ * 生成文章列表的 HTML 字符串。
+ */
+function renderPostListHTML(posts) {
+  return posts
+    .map(post => {
+      const tags = (post.tags || [])
+        .map(tag => `<span class="post-tag">${escapeHTML(tag)}</span>`)
+        .join('');
+
+      return (
+        `<li class="post-item">` +
+        `<a class="post-item__link" href="posts/${escapeHTML(post.slug)}.html">` +
+        `<div class="post-meta">` +
+        `<time datetime="${escapeHTML(post.date)}">${escapeHTML(post.date)}</time>` +
+        `<span class="post-meta__sep">·</span>` +
+        tags +
+        `<span class="post-meta__sep">·</span>` +
+        `<span class="post-item__reading">${escapeHTML(post.readingTime)} 分钟</span>` +
+        `</div>` +
+        `<h2 class="post-item__title">${escapeHTML(post.title)}</h2>` +
+        `<p class="post-item__summary">${escapeHTML(post.summary)}</p>` +
+        `</a>` +
+        `</li>`
+      );
+    })
+    .join('');
+}
+
 // Node 测试用；浏览器中 module 未定义，此行跳过。
 if (typeof module !== 'undefined') {
   module.exports = {
@@ -79,6 +124,8 @@ if (typeof module !== 'undefined') {
     extractTags,
     filterByTag,
     parseTagFromHash,
-    resolveTheme
+    resolveTheme,
+    renderTagBarHTML,
+    renderPostListHTML
   };
 }

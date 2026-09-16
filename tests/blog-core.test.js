@@ -6,7 +6,9 @@ const {
   extractTags,
   filterByTag,
   parseTagFromHash,
-  resolveTheme
+  resolveTheme,
+  renderTagBarHTML,
+  renderPostListHTML
 } = require('../assets/js/blog-core.js');
 
 // ---- escapeHTML ----
@@ -129,4 +131,78 @@ test('resolveTheme 无保存值时跟随系统偏好', () => {
 test('resolveTheme 忽略非法的保存值', () => {
   assert.strictEqual(resolveTheme('purple', true), 'dark');
   assert.strictEqual(resolveTheme('', false), 'light');
+});
+
+// ---- renderPostListHTML ----
+
+const SAMPLE = [
+  {
+    slug: 'array-generics-pitfall',
+    title: 'Array<T> 的类型陷阱',
+    date: '2026-09-02',
+    tags: ['TypeScript'],
+    summary: '泛型协变 & 逆变',
+    readingTime: 6
+  }
+];
+
+test('renderPostListHTML 生成指向 posts/<slug>.html 的链接', () => {
+  const html = renderPostListHTML(SAMPLE);
+  assert.ok(html.includes('href="posts/array-generics-pitfall.html"'));
+});
+
+test('renderPostListHTML 转义标题中的尖括号（回归测试）', () => {
+  const html = renderPostListHTML(SAMPLE);
+  assert.ok(html.includes('Array&lt;T&gt; 的类型陷阱'), '标题未被转义');
+  assert.ok(!html.includes('Array<T>'), '原始尖括号泄漏到 HTML 中');
+});
+
+test('renderPostListHTML 转义摘要中的 &', () => {
+  const html = renderPostListHTML(SAMPLE);
+  assert.ok(html.includes('泛型协变 &amp; 逆变'));
+});
+
+test('renderPostListHTML 输出 time 元素的 datetime 属性', () => {
+  const html = renderPostListHTML(SAMPLE);
+  assert.ok(html.includes('<time datetime="2026-09-02">2026-09-02</time>'));
+});
+
+test('renderPostListHTML 输出阅读时长', () => {
+  assert.ok(renderPostListHTML(SAMPLE).includes('6 分钟'));
+});
+
+test('renderPostListHTML 对空数组返回空串', () => {
+  assert.strictEqual(renderPostListHTML([]), '');
+});
+
+test('renderPostListHTML 渲染多个标签', () => {
+  const post = Object.assign({}, SAMPLE[0], { tags: ['JavaScript', 'CSS'] });
+  const html = renderPostListHTML([post]);
+  assert.ok(html.includes('JavaScript'));
+  assert.ok(html.includes('CSS'));
+});
+
+// ---- renderTagBarHTML ----
+
+test('renderTagBarHTML 为每个标签生成按钮', () => {
+  const html = renderTagBarHTML(['CSS', 'JavaScript'], null);
+  assert.ok(html.includes('data-tag="CSS"'));
+  assert.ok(html.includes('data-tag="JavaScript"'));
+});
+
+test('renderTagBarHTML 未选中时所有按钮 aria-pressed 为 false', () => {
+  const html = renderTagBarHTML(['CSS'], null);
+  assert.ok(html.includes('aria-pressed="false"'));
+  assert.ok(!html.includes('aria-pressed="true"'));
+});
+
+test('renderTagBarHTML 选中项 aria-pressed 为 true 且仅有一个', () => {
+  const html = renderTagBarHTML(['CSS', 'JavaScript'], 'JavaScript');
+  const active = html.match(/aria-pressed="true"/g);
+  assert.strictEqual(active.length, 1);
+});
+
+test('renderTagBarHTML 转义标签名', () => {
+  const html = renderTagBarHTML(['a<b'], null);
+  assert.ok(html.includes('a&lt;b'));
 });
