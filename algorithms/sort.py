@@ -1,19 +1,30 @@
-"""三种排序算法的实现。
+"""六种排序算法的实现。
 
-三个函数遵循同一套约定：
+每个函数遵循同一套约定：
 
     sort(items) -> list
 
 - 返回一个**新的已排序列表**，不修改传入的 items
 - 只要求元素之间可比较（`<` / `<=`），因此数字、字符串都适用
-- 均为稳定或非稳定排序，各自在下方的 docstring 中说明
+- 稳定与否，各自在下方的 docstring 中说明
 
-复杂度一览：
+复杂度一览（额外空间指除输出副本之外的开销）：
 
-    算法          平均        最坏        额外空间    稳定
-    bubble_sort   O(n²)      O(n²)      O(n)       是
-    merge_sort    O(n log n) O(n log n) O(n)       是
-    quick_sort    O(n log n) O(n²)      O(log n)   否
+    算法             平均        最坏        额外空间    稳定
+    bubble_sort      O(n²)      O(n²)      O(1)       是
+    insertion_sort   O(n²)      O(n²)      O(1)       是
+    selection_sort   O(n²)      O(n²)      O(1)       否
+    merge_sort       O(n log n) O(n log n) O(n)       是
+    quick_sort       O(n log n) O(n²)      O(log n)   否
+    heap_sort        O(n log n) O(n log n) O(1)       否
+
+选择建议：
+
+    n 很小或基本有序    插入排序（常数因子小，近乎有序时接近 O(n)）
+    要求稳定            归并排序或插入排序
+    要求最坏也是 O(n log n)  归并排序或堆排序
+    实际通用            快速排序（平均最快，但最坏 O(n²)）
+    额外空间要 O(1)      堆排序
 """
 
 
@@ -155,3 +166,99 @@ def _partition(arr, low, high):
 
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
+
+
+def insertion_sort(items):
+    """插入排序。
+
+    把每个元素插入到左侧已排好序的部分中。对基本有序的输入非常快
+    （内层循环几乎不执行），是三种 O(n²) 算法里实际最常用的一个。
+
+    稳定：内层用 `>` 比较，相等元素不会被越过。
+
+    >>> insertion_sort([3, 1, 2])
+    [1, 2, 3]
+    """
+    result = list(items)
+
+    for i in range(1, len(result)):
+        key = result[i]
+        j = i - 1
+        # 所有比 key 大的元素右移一位，腾出 key 的位置
+        while j >= 0 and result[j] > key:
+            result[j + 1] = result[j]
+            j -= 1
+        result[j + 1] = key
+
+    return result
+
+
+def selection_sort(items):
+    """选择排序。
+
+    每一轮从未排序的部分中选出最小值，与该部分首位交换。
+
+    非稳定：远距离交换会把相等元素甩到彼此后面。
+    交换次数固定为 O(n)，因此在「写入代价高」的场景反而有优势。
+
+    >>> selection_sort([3, 1, 2])
+    [1, 2, 3]
+    """
+    result = list(items)
+    n = len(result)
+
+    for i in range(n - 1):
+        min_index = i
+        for j in range(i + 1, n):
+            if result[j] < result[min_index]:
+                min_index = j
+        if min_index != i:
+            result[i], result[min_index] = result[min_index], result[i]
+
+    return result
+
+
+def heap_sort(items):
+    """堆排序。
+
+    先把列表整理成最大堆，再反复把堆顶（当前最大值）换到末尾，
+    并对缩小后的堆重新下沉。
+
+    非稳定：堆化与交换都会打乱相等元素的相对顺序。
+    最坏也是 O(n log n) 且额外空间 O(1)，这是它相对快排的优势。
+
+    >>> heap_sort([3, 1, 2])
+    [1, 2, 3]
+    """
+    result = list(items)
+    n = len(result)
+
+    # 建堆：从最后一个非叶节点开始，逐个向前下沉
+    for i in range(n // 2 - 1, -1, -1):
+        _sift_down(result, i, n)
+
+    # 依次把堆顶换到末尾，堆的规模减一后再恢复堆性质
+    for end in range(n - 1, 0, -1):
+        result[0], result[end] = result[end], result[0]
+        _sift_down(result, 0, end)
+
+    return result
+
+
+def _sift_down(arr, root, size):
+    """把 arr[root] 下沉到合适位置，维持 arr[0..size-1] 的最大堆性质。
+
+    写成循环而非递归：堆的高度是 O(log n)，递归版虽不至于溢出，
+    但循环版没有调用开销，也不占栈空间。
+    """
+    while True:
+        child = 2 * root + 1
+        if child >= size:
+            return
+        # 取左右孩子中较大的那个
+        if child + 1 < size and arr[child + 1] > arr[child]:
+            child += 1
+        if arr[root] >= arr[child]:
+            return
+        arr[root], arr[child] = arr[child], arr[root]
+        root = child

@@ -14,9 +14,15 @@ import unittest
 #   2. 直接运行本文件（python3 algorithms/test_sort.py）—— 此时
 #      sys.path 里是 algorithms/ 而非仓库根目录，包名导入会失败。
 try:
-    from algorithms.sort import bubble_sort, merge_sort, quick_sort
+    from algorithms.sort import (
+        bubble_sort, merge_sort, quick_sort,
+        insertion_sort, selection_sort, heap_sort,
+    )
 except ModuleNotFoundError:
-    from sort import bubble_sort, merge_sort, quick_sort
+    from sort import (
+        bubble_sort, merge_sort, quick_sort,
+        insertion_sort, selection_sort, heap_sort,
+    )
 
 
 class SortContractMixin:
@@ -137,6 +143,24 @@ class TestMergeSort(SortContractMixin, unittest.TestCase):
 
 class TestQuickSort(SortContractMixin, unittest.TestCase):
     sort = staticmethod(quick_sort)
+
+
+# ---- 第二批：简单排序与堆排序 ----
+#
+# 这三种是 O(n²) / O(n log n) 里另外三个代表，与上面的冒泡/归并/快排
+# 共用同一套契约测试，因此边界行为完全对齐。
+
+
+class TestInsertionSort(SortContractMixin, unittest.TestCase):
+    sort = staticmethod(insertion_sort)
+
+
+class TestSelectionSort(SortContractMixin, unittest.TestCase):
+    sort = staticmethod(selection_sort)
+
+
+class TestHeapSort(SortContractMixin, unittest.TestCase):
+    sort = staticmethod(heap_sort)
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ cp posts/_template.html posts/my-new-post.html
 ├── posts/                文章页，一篇一个 HTML 文件
 │   └── _template.html    新文章模板（复制它来写新文章）
 ├── algorithms/           排序算法（Python）
-│   ├── sort.py           冒泡 / 归并 / 快速排序
+│   ├── sort.py           六种排序算法（见下）
 │   └── test_sort.py      标准库 unittest 测试
 ├── assets/
 │   ├── css/
@@ -78,7 +78,19 @@ bash tests/render-check.sh
 
 ### 排序算法的测试（Python）
 
-`algorithms/` 下是三种排序算法，用 Python 标准库 `unittest` 测试，同样无需安装任何依赖：
+`algorithms/` 下是六种排序算法，用 Python 标准库 `unittest` 测试，同样无需安装任何依赖：
+
+| 算法 | 平均 | 最坏 | 额外空间 | 稳定 |
+|---|---|---|---|---|
+| `bubble_sort` | O(n²) | O(n²) | O(1) | 是 |
+| `insertion_sort` | O(n²) | O(n²) | O(1) | 是 |
+| `selection_sort` | O(n²) | O(n²) | O(1) | 否 |
+| `merge_sort` | O(n log n) | O(n log n) | O(n) | 是 |
+| `quick_sort` | O(n log n) | O(n²) | O(log n) | 否 |
+| `heap_sort` | O(n log n) | O(n log n) | O(1) | 否 |
+
+六个算法都返回**新的已排序列表**，不修改入参。
+
 
 ```bash
 python3 -m unittest discover -s algorithms -p 'test_*.py' -v
@@ -92,7 +104,9 @@ python3 -m unittest discover                 # 从仓库根递归发现
 python3 algorithms/test_sort.py              # 直接运行测试文件
 ```
 
-57 个用例覆盖空列表、单元素、已排序、逆序、重复值、负数、浮点数，以及「不修改原列表」「返回值不是入参别名」等约定。三个算法共用同一套契约测试（`SortContractMixin`），任何实现有缺口都会立刻暴露。
+114 个用例覆盖空列表、单元素、已排序、逆序、重复值、负数、浮点数，以及「不修改原列表」「返回值不是入参别名」等约定。
+
+六个算法共用同一套契约测试（`SortContractMixin`）——每个算法只需声明自己的 `sort` 函数，就自动继承全部 19 项边界检查，因此任何实现有缺口都会立刻暴露。新增算法时不必重写测试，加一个子类即可。
 
 其中包含针对快排最坏情况的回归用例：2000 个元素的已排序、逆序、全相同输入。这三条曾经会让程序因递归过深而崩溃。
 
