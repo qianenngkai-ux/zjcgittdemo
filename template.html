@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 改这里：文章标题 -->
+  <title>文章标题 — 我的技术博客</title>
+  <!-- 路径按文章页在 posts/ 下的位置写成 ../ 前缀，复制后无需修改 -->
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/post.css">
+  <script src="../assets/js/blog-core.js"></script>
+  <script src="../assets/js/posts.js"></script>
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-title" href="../index.html">我的技术博客</a>
+      <nav class="site-nav">
+        <a class="site-nav__link" href="../about.html">关于</a>
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换主题"></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <article>
+      <a class="back-link" href="../index.html">← 返回首页</a>
+
+      <header class="post-header">
+        <!-- 改这里：标题 -->
+        <h1 class="post-header__title">文章标题</h1>
+        <div class="post-meta">
+          <!-- 改这里：日期 -->
+          <time datetime="2026-01-01">2026-01-01</time>
+          <span class="post-meta__sep">·</span>
+          <!-- 改这里：标签，可有多个 -->
+          <span class="post-tag">标签</span>
+          <span class="post-meta__sep">·</span>
+          <!-- 改这里：阅读时长 -->
+          <span>5 分钟</span>
+        </div>
+      </header>
+
+      <div class="post-body">
+        <!-- 改这里：正文 -->
+        <p>正文从这里开始。</p>
+
+        <h2>二级标题</h2>
+        <p>段落文字。<code>行内代码</code> 长这样。</p>
+
+        <pre><code>// 代码块长这样，深色底、可横向滚动
+const answer = 42;</code></pre>
+
+        <blockquote><p>引用长这样。</p></blockquote>
+
+        <ul>
+          <li>无序列表项</li>
+          <li>另一项</li>
+        </ul>
+        <!-- 正文结束 -->
+      </div>
+    </article>
+
+    <nav class="post-nav">
+      <!-- 改这里：上一篇 / 下一篇链接，没有就删掉对应的 <a> -->
+      <a href="../index.html">
+        <span class="post-nav__label">← 上一篇</span>
+        <span>上一篇标题</span>
+      </a>
+      <a class="post-nav__next" href="../index.html">
+        <span class="post-nav__label">下一篇 →</span>
+        <span>下一篇标题</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© 2026 我的技术博客</p></div>
+  </footer>
+</body>
+</html>

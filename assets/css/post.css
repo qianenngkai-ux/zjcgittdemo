@@ -1,0 +1,127 @@
+/* ===== 文章页正文排版 ===== */
+
+.post-header { padding: 2.5rem 0 1.5rem; }
+
+.post-header__title {
+  font-size: 1.9rem;
+  line-height: 1.35;
+  margin: 0 0 0.75rem;
+}
+
+.back-link {
+  color: var(--text-muted);
+  display: inline-block;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.back-link:hover { color: var(--accent); }
+
+.post-body { padding-bottom: 1rem; }
+
+.post-body h2 {
+  font-size: 1.4rem;
+  line-height: 1.4;
+  margin: 2.5rem 0 0.75rem;
+}
+
+.post-body h3 {
+  font-size: 1.15rem;
+  line-height: 1.4;
+  margin: 2rem 0 0.6rem;
+}
+
+.post-body p { margin: 0 0 1.25rem; }
+
+.post-body ul,
+.post-body ol { margin: 0 0 1.25rem; padding-left: 1.5rem; }
+.post-body li { margin-bottom: 0.4rem; }
+
+.post-body img {
+  border-radius: var(--radius);
+  display: block;
+  height: auto;
+  margin: 1.75rem 0;
+  max-width: 100%;
+}
+
+.post-body blockquote {
+  border-left: 3px solid var(--border);
+  color: var(--text-muted);
+  margin: 1.75rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+}
+.post-body blockquote p:last-child { margin-bottom: 0; }
+
+/* 行内代码 */
+.post-body code {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+}
+
+/* 代码块：深色底 + 横向滚动，不做语法高亮 */
+.post-body pre {
+  background: #1e1e24;
+  border-radius: var(--radius);
+  color: #e5e7eb;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 1.75rem 0;
+  overflow-x: auto;
+  padding: 1.1rem 1.25rem;
+}
+
+.post-body pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+
+.post-body table {
+  border-collapse: collapse;
+  display: block;
+  margin: 1.75rem 0;
+  overflow-x: auto;
+  width: 100%;
+}
+.post-body th,
+.post-body td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.post-body th { background: var(--bg-subtle); }
+
+.post-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* ===== 上一篇 / 下一篇 ===== */
+.post-nav {
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+}
+.post-nav a { max-width: 48%; }
+.post-nav__label {
+  color: var(--text-muted);
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+.post-nav__next { margin-left: auto; text-align: right; }
+
+@media (max-width: 480px) {
+  .post-header__title { font-size: 1.5rem; }
+  .post-body h2 { font-size: 1.25rem; }
+}
