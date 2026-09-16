@@ -10,8 +10,8 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'blog-theme';
-  var root = document.documentElement;
+  const STORAGE_KEY = 'blog-theme';
+  const root = document.documentElement;
 
   function readStoredTheme() {
     try {
@@ -26,7 +26,7 @@
   }
 
   // ---- 立即执行：在首帧渲染前定好主题 ----
-  var theme = resolveTheme(readStoredTheme(), prefersDark());
+  let theme = resolveTheme(readStoredTheme(), prefersDark());
   root.setAttribute('data-theme', theme);
 
   function updateButton(button) {
@@ -37,7 +37,7 @@
 
   // ---- 按钮此时还不存在，等 DOM 就绪后再绑定 ----
   document.addEventListener('DOMContentLoaded', function () {
-    var button = document.getElementById('theme-toggle');
+    const button = document.getElementById('theme-toggle');
     if (!button) return;
 
     updateButton(button);

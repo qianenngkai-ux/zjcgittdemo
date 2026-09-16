@@ -13,7 +13,8 @@
 <body>
   <header class="site-header">
     <div class="container site-header__inner">
-      <a class="site-title" href="index.html">我的技术博客</a>
+      <!-- 首页用 h1 承载站点标题：文章标题是 h2，缺 h1 会让标题层级从 h2 起始 -->
+      <h1 class="site-title"><a class="site-title__link" href="index.html">我的技术博客</a></h1>
       <nav class="site-nav">
         <a class="site-nav__link" href="about.html">关于</a>
         <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换主题"></button>
@@ -24,7 +25,6 @@
   <main class="container">
     <div class="tag-bar" id="tag-bar" role="group" aria-label="按标签筛选"></div>
     <ul class="post-list" id="post-list"></ul>
-    <p class="empty-state" id="empty-state" hidden>这个标签下还没有文章。</p>
   </main>
 
   <footer class="site-footer">

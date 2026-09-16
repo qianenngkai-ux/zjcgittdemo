@@ -51,7 +51,7 @@ check "标签按字母序，CSS 在最前"   1 "$HOME_DOM" 'data-tag="CSS"'
 check "标题尖括号已转义"           1 "$HOME_DOM" 'Array&lt;T&gt;'
 check "未泄漏原始尖括号"           0 "$HOME_DOM" 'Array<T>'
 check "html 上写入了 data-theme"   1 "$HOME_DOM" 'data-theme="light"'
-check "空状态默认隐藏"             1 "$HOME_DOM" 'id="empty-state" hidden=""'
+check "首页有 h1"                  1 "$HOME_DOM" '<h1'
 check "引入了 main.css"            1 "$HOME_DOM" 'assets/css/main.css'
 check "引入了 home.js"             1 "$HOME_DOM" 'assets/js/home.js'
 
@@ -72,8 +72,9 @@ check "关于页样式已引入"           1 "$ABOUT_DOM" 'assets/css/post.css'
 check "关于页也有主题按钮"         1 "$ABOUT_DOM" 'id="theme-toggle"'
 
 echo "模板 render"
-TPL_DOM=$(dump_dom template.html)
+TPL_DOM=$(dump_dom posts/_template.html)
 check "模板有主题按钮"             1 "$TPL_DOM" 'id="theme-toggle"'
+check "模板样式已引入"             1 "$TPL_DOM" 'href="../assets/css/main.css"'
 
 echo
 echo "通过 $pass 项，失败 $fail 项"

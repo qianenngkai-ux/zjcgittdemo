@@ -73,12 +73,18 @@ a:hover { color: var(--accent-hover); }
   gap: 1rem;
 }
 
+/* 首页上是 <h1 class="site-title"><a class="site-title__link">，
+   其余页面是 <a class="site-title">。两种结构共用下面的样式。 */
 .site-title {
   font-size: 1.1rem;
   font-weight: 600;
+  line-height: 1.4;
+  margin: 0;              /* h1 自带上下外边距，需清零以免撑开页头 */
   color: var(--text);
 }
-.site-title:hover { color: var(--accent); }
+.site-title:hover { color: var(--accent); }        /* 非首页：元素自身是链接 */
+.site-title a { color: inherit; }                  /* 首页：链接在 h1 内部 */
+.site-title a:hover { color: var(--accent); }
 
 .site-nav {
   display: flex;
@@ -170,12 +176,6 @@ a:hover { color: var(--accent-hover); }
   color: var(--text-muted);
   font-size: 0.95rem;
   margin: 0;
-}
-
-.empty-state {
-  color: var(--text-muted);
-  padding: 2rem 0;
-  text-align: center;
 }
 
 /* ===== 页脚 ===== */

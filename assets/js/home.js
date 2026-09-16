@@ -6,7 +6,6 @@
 
   const listEl = document.getElementById('post-list');
   const tagBarEl = document.getElementById('tag-bar');
-  const emptyEl = document.getElementById('empty-state');
 
   const allTags = extractTags(POSTS);
   const sorted = sortByDateDesc(POSTS);
@@ -21,7 +20,6 @@
 
     tagBarEl.innerHTML = renderTagBarHTML(allTags, activeTag);
     listEl.innerHTML = renderPostListHTML(visible);
-    emptyEl.hidden = visible.length > 0;
   }
 
   function setActiveTag(tag) {

@@ -11,12 +11,12 @@
 **第一步**，复制模板并写正文：
 
 ```bash
-cp template.html posts/my-new-post.html
+cp posts/_template.html posts/my-new-post.html
 ```
 
 打开 `posts/my-new-post.html`，按文件里 `<!-- 改这里 -->` 注释的提示替换标题、日期、标签、正文，以及底部的上一篇/下一篇链接。
 
-模板里的资源路径已经写成 `../` 前缀，复制到 `posts/` 下后无需再改。
+模板放在 `posts/` 下、且资源路径已写成 `../` 前缀，所以复制后**无需改动任何路径**，直接双击就能正常预览。
 
 文件名（去掉 `.html`）就是文章的 slug，例如 `my-new-post.html` 对应 slug `my-new-post`。
 
@@ -40,8 +40,8 @@ cp template.html posts/my-new-post.html
 ```
 ├── index.html            首页
 ├── about.html            关于
-├── template.html         新文章模板
 ├── posts/                文章页，一篇一个 HTML 文件
+│   └── _template.html    新文章模板（复制它来写新文章）
 ├── algorithms/           排序算法（Python）
 │   ├── sort.py           冒泡 / 归并 / 快速排序
 │   └── test_sort.py      标准库 unittest 测试
@@ -54,6 +54,7 @@ cp template.html posts/my-new-post.html
 │       ├── posts.js      文章数据 —— 唯一要维护的数据文件
 │       ├── theme.js      主题切换
 │       └── home.js       首页渲染与标签筛选
+├── docs/                 设计与实现文档
 └── tests/                测试
 ```
 
@@ -83,7 +84,17 @@ bash tests/render-check.sh
 python3 -m unittest discover -s algorithms -p 'test_*.py' -v
 ```
 
-48 个用例覆盖空列表、单元素、已排序、逆序、重复值、负数、浮点数，以及「不修改原列表」「返回值不是入参别名」等约定。三个算法共用同一套契约测试（`SortContractMixin`），任何实现有缺口都会立刻暴露。
+下面几种写法都可以，效果相同：
+
+```bash
+python3 -m unittest algorithms.test_sort     # 当作包导入
+python3 -m unittest discover                 # 从仓库根递归发现
+python3 algorithms/test_sort.py              # 直接运行测试文件
+```
+
+57 个用例覆盖空列表、单元素、已排序、逆序、重复值、负数、浮点数，以及「不修改原列表」「返回值不是入参别名」等约定。三个算法共用同一套契约测试（`SortContractMixin`），任何实现有缺口都会立刻暴露。
+
+其中包含针对快排最坏情况的回归用例：2000 个元素的已排序、逆序、全相同输入。这三条曾经会让程序因递归过深而崩溃。
 
 docstring 里的示例可直接验证：
 
