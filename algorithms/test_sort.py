@@ -1,4 +1,4 @@
-"""sort.py 中三种排序算法的测试。
+"""sort.py 中六种排序算法的测试。
 
 用标准库 unittest，无需 pip install —— 与仓库其余部分「零依赖」的约定一致。
 
@@ -8,6 +8,7 @@
 
 import random
 import unittest
+from functools import total_ordering
 
 # 兼容两种运行方式：
 #   1. 当作包导入（-m unittest algorithms.test_sort、根目录 discover）
@@ -25,11 +26,36 @@ except ModuleNotFoundError:
     )
 
 
+@total_ordering
+class Ranked:
+    """自定义可比较类型，用于验证「元素可排序」这一契约。
+
+    - 只实现 `__eq__` 与 `__lt__`，其余四个比较运算符由 total_ordering 补全
+    - `order` 记录原始位置，用于检验稳定性：相等元素的 order 应保持递增
+
+    之所以需要这个类型：内置的 int / float / str 天然支持全部运算符，
+    用它们做测试无法发现「某个算法多要求了一个运算符」这类问题。
+    """
+
+    def __init__(self, key, order=0):
+        self.key = key
+        self.order = order
+
+    def __eq__(self, other):
+        return self.key == other.key
+
+    def __lt__(self, other):
+        return self.key < other.key
+
+    def __repr__(self):
+        return f"<{self.key}#{self.order}>"
+
+
 class SortContractMixin:
-    """三种排序算法共有的行为契约。
+    """六种排序算法共有的行为契约。
 
     子类只需提供 `sort` 属性指向被测函数，即可继承下面全部用例。
-    这样三个算法跑的是同一套边界条件，任何一个实现有缺口都会立刻暴露。
+    这样六个算法跑的是同一套边界条件，任何一个实现有缺口都会立刻暴露。
     """
 
     sort = None
@@ -99,6 +125,21 @@ class SortContractMixin:
         result.append(99)
         self.assertEqual(original, [2, 1], "修改返回值不应影响原列表")
 
+    # ---- 自定义可比较类型 ----
+    #
+    # 下面两条盯住模块 docstring 里的「元素可排序」契约。历史教训：测试
+    # 若只用 int / float / str，则「某个算法悄悄多依赖了一个比较运算符」
+    # 不会被发现 —— 而这正是曾经真实存在的问题（merge/quick 需要 __le__，
+    # heap 需要 >=，只定义 __lt__ 的类型会抛 TypeError）。
+
+    def test_sorts_custom_comparable_type(self):
+        items = [Ranked(3), Ranked(1), Ranked(2)]
+        self.assertEqual([x.key for x in self.sort(items)], [1, 2, 3])
+
+    def test_sorts_custom_type_with_duplicates(self):
+        items = [Ranked(2), Ranked(1), Ranked(2), Ranked(0)]
+        self.assertEqual([x.key for x in self.sort(items)], [0, 1, 2, 2])
+
     # ---- 规模与随机性 ----
 
     def test_larger_random_list(self):
@@ -116,6 +157,8 @@ class SortContractMixin:
     # 固定取末位作基准的分区，在有序输入下每次划分都极不平衡，递归深度
     # 退化为 O(n)，会撞上 Python 默认的递归上限（1000）直接崩溃。
     # 下面三条用例专门盯住这个最坏情况，规模取 2000 以留出安全余量。
+    #
+    # 必须对全部六个算法运行 —— 尤其 quick_sort，它正是当初崩溃的那个。
 
     def test_large_already_sorted(self):
         """已排序的大输入 —— 快排的经典最坏情况。"""
@@ -133,11 +176,48 @@ class SortContractMixin:
         self.assertEqual(self.sort(data), data)
 
 
-class TestBubbleSort(SortContractMixin, unittest.TestCase):
+class StableSortMixin:
+    """稳定排序额外要满足的保证：相等元素保持原有相对顺序。
+
+    只被声明为「稳定」的三个算法继承（bubble / insertion / merge）。
+
+    另外三个声明为非稳定 —— 但「非稳定」意味着**不保证**顺序，而不是
+    「一定会打乱」，所以对它们断言顺序变化属于依赖具体实现的测试，
+    不能当作契约。它们只继承上面的通用契约。
+    """
+
+    sort = None
+
+    def test_preserves_order_of_equal_elements(self):
+        items = [Ranked(1, 0), Ranked(1, 1), Ranked(1, 2)]
+        out = self.sort(items)
+        self.assertEqual([x.order for x in out], [0, 1, 2],
+                         "相等元素应保持原有相对顺序")
+
+    def test_preserves_order_with_interleaved_elements(self):
+        items = [Ranked(2, 0), Ranked(1, 1), Ranked(2, 2), Ranked(1, 3), Ranked(0, 4)]
+        out = self.sort(items)
+        self.assertEqual([x.order for x in out if x.key == 2], [0, 2])
+        self.assertEqual([x.order for x in out if x.key == 1], [1, 3])
+
+    def test_preserves_order_on_large_input_with_many_duplicates(self):
+        rng = random.Random(11)
+        items = [Ranked(rng.randint(0, 3), i) for i in range(200)]
+        out = self.sort(items)
+        for key in {x.key for x in items}:
+            orders = [x.order for x in out if x.key == key]
+            self.assertEqual(orders, sorted(orders), f"key={key} 的相等元素顺序被打乱")
+
+
+# 声明为「稳定」的三个算法，额外继承稳定性契约。
+# 另外三个（selection / quick / heap）声明为非稳定，只继承通用契约。
+
+
+class TestBubbleSort(SortContractMixin, StableSortMixin, unittest.TestCase):
     sort = staticmethod(bubble_sort)
 
 
-class TestMergeSort(SortContractMixin, unittest.TestCase):
+class TestMergeSort(SortContractMixin, StableSortMixin, unittest.TestCase):
     sort = staticmethod(merge_sort)
 
 
@@ -151,7 +231,7 @@ class TestQuickSort(SortContractMixin, unittest.TestCase):
 # 共用同一套契约测试，因此边界行为完全对齐。
 
 
-class TestInsertionSort(SortContractMixin, unittest.TestCase):
+class TestInsertionSort(SortContractMixin, StableSortMixin, unittest.TestCase):
     sort = staticmethod(insertion_sort)
 
 
