@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我的技术博客</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <!-- 顺序不可调换：blog-core 提供函数，posts 提供数据，theme 依赖 blog-core -->
+  <script src="assets/js/blog-core.js"></script>
+  <script src="assets/js/posts.js"></script>
+  <script src="assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-title" href="index.html">我的技术博客</a>
+      <nav class="site-nav">
+        <a class="site-nav__link" href="about.html">关于</a>
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换主题"></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="tag-bar" id="tag-bar" role="group" aria-label="按标签筛选"></div>
+    <ul class="post-list" id="post-list"></ul>
+    <p class="empty-state" id="empty-state" hidden>这个标签下还没有文章。</p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© 2026 我的技术博客</p></div>
+  </footer>
+
+  <script src="assets/js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Array&lt;T&gt; 与 Array&lt;U&gt; 的类型陷阱 — 我的技术博客</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/post.css">
+  <script src="../assets/js/blog-core.js"></script>
+  <script src="../assets/js/posts.js"></script>
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="site-title" href="../index.html">我的技术博客</a>
+      <nav class="site-nav">
+        <a class="site-nav__link" href="../about.html">关于</a>
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="切换主题"></button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <article>
+      <a class="back-link" href="../index.html">← 返回首页</a>
+
+      <header class="post-header">
+        <h1 class="post-header__title">Array&lt;T&gt; 与 Array&lt;U&gt; 的类型陷阱</h1>
+        <div class="post-meta">
+          <time datetime="2026-09-02">2026-09-02</time>
+          <span class="post-meta__sep">·</span>
+          <span class="post-tag">TypeScript</span>
+          <span class="post-tag">JavaScript</span>
+          <span class="post-meta__sep">·</span>
+          <span>6 分钟</span>
+        </div>
+      </header>
+
+      <div class="post-body">
+        <p>泛型的协变与逆变是 TypeScript 里最容易被跳过的一节。跳过它的代价是：某天你会写出一段编译通过、运行时报错的代码。</p>
+
+        <h2>数组是协变的，这是个问题</h2>
+        <p>TypeScript 默认认为数组是协变的：如果 <code>Dog</code> 是 <code>Animal</code> 的子类型，那么 <code>Array&lt;Dog&gt;</code> 也可以赋给 <code>Array&lt;Animal&gt;</code>。</p>
+
+        <pre><code>interface Animal { name: string }
+interface Dog extends Animal { bark(): void }
+
+const dogs: Dog[] = [{ name: 'Rex', bark() {} }];
+const animals: Animal[] = dogs;  // 编译通过
+
+animals.push({ name: 'Cat' });   // 编译通过
+dogs[1].bark();                  // 运行时崩溃：bark is not a function</code></pre>
+
+        <p>问题出在最后一行——<code>dogs</code> 里混进了一个没有 <code>bark</code> 的对象。类型系统本该拦住这件事。</p>
+
+        <h2>为什么 TypeScript 允许</h2>
+        <p>这是为实用性做的妥协。数组的可读用法（遍历、<code>map</code>）远多于可写用法，如果严格用不变（invariant）处理，大量正常代码会报错。官方在文档里称这是「刻意的不健全」。</p>
+
+        <h2>怎么规避</h2>
+        <p>需要可写时，用 <code>readonly</code> 明确表达意图：</p>
+
+        <pre><code>function sum(values: readonly number[]): number {
+  return values.reduce((a, b) =&gt; a + b, 0);
+}</code></pre>
+
+        <p><code>readonly T[]</code> 不允许 <code>push</code>，因此协变是安全的。函数参数位置上的数组，默认写成 <code>readonly</code> 能避免这类问题。</p>
+
+        <h2>小结</h2>
+        <p>看到 <code>Array&lt;T&gt;</code> 出现在会被修改的位置时，多问一句「这里真的需要往里写吗」。不需要的话就加 <code>readonly</code>。</p>
+      </div>
+    </article>
+
+    <nav class="post-nav">
+      <a href="css-grid-tricks.html">
+        <span class="post-nav__label">← 上一篇</span>
+        <span>Grid 布局的五个实用技巧</span>
+      </a>
+      <a class="post-nav__next" href="understanding-closures.html">
+        <span class="post-nav__label">下一篇 →</span>
+        <span>理解闭包到底在讲什么</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© 2026 我的技术博客</p></div>
+  </footer>
+</body>
+</html>
